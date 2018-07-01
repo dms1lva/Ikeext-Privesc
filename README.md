@@ -81,6 +81,7 @@ PS C:\temp> Invoke-IkeextExploit
 
 ## Update 
 2018-07-01 - The current folder doesn't need to be writable anymore. The script will now try to create a dummy file in each PATH folder instead of creating one in the current folder and then trying to copy it. 
+
 2018-07-01 - The initial DLL payload executed the command line "cmd /c C:\PATH\TO\payload.bat". The problem is that if the path contained spaces, a part of it would be interpreted as arguments to cmd. That's why the full path is now between quotes. 
 
 ## Credits 
