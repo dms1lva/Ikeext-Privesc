@@ -263,23 +263,24 @@ function Invoke-IkeextCheck {
     }
     $dummy_file = (-join $final_string) + ".txt"
 
-    # Create a temporary file 
-    New-Item $dummy_file -type file | Out-Null
-
     # For each folder in the PATH, we check whether we have R/W access 
     $sys_env_path | foreach {
         if ($_.length -gt 0) {
             $test_path = Test-Path -Path $_ -errorAction SilentlyContinue -errorVariable errors
             if ($errors.count -eq 0) {
                 if ($test_path) {
-                    # Folder exists 
-                    Copy-Item $dummy_file $_ -errorAction SilentlyContinue -errorVariable errors
+                    # For each folder we try to create a dummy TXT file.
+                    # If there is no error, the file was created successfully so we have write access.
+                    # Otherwise, an error occurred, which most probably mean that we don't have write access.
+                    $dummy_file_path = "$($_)\$($dummy_file)"
+                    New-Item "$($dummy_file_path)" -Type file -ErrorAction SilentlyContinue -ErrorVariable errors | Out-Null
+
                     if ($errors.count -eq 0)
                     {
                         # File creation succeeded
                         $vulnerable_folders += $_ # We add teh path to the list of vulnerable folders 
                         if ($Verbose) { Write-Host -NoNewLine -ForeGroundColor Green "[+] " ; Write-Host "|__ Access granted: '$_'" }
-                        Remove-Item "$_\$dummy_file"
+                        Remove-Item "$($dummy_file_path)" # Clean the mess 
                     } else {
                         # Folder exists but we can't create a file there 
                         if ($Verbose) { Write-Host -NoNewLine -ForeGroundColor Red "[-] " ; Write-Host "|__ Access denied: '$_'" }
@@ -305,15 +306,12 @@ function Invoke-IkeextCheck {
         Write-Host "[-] " -NoNewLine -ForeGroundColor Red ; Write-Host "Found $($vulnerable_folders.count) PATH folder(s) with weak permissions."
     }
 
-    # Delete the temporary file 
-    Remove-Item $dummy_file
-
     if ($Verbose) { Write-Host "" }
 
     # --------------------------------------------------------------------------------
     # Check whether 'wlbsctrl.dll' is already present on the file system
     # --------------------------------------------------------------------------------
-    if ($Verbose) { Write-Host -NoNewLine -ForeGroundColor Blue "[*] " ; Write-Host "Searching for 'wlbsctrl.dll' on the system" }
+    if ($Verbose) { Write-Host -NoNewLine -ForeGroundColor Blue "[*] " ; Write-Host "Searching for 'wlbsctrl.dll' (DLL search Path only)" }
     $dll_files = @() # Will hold the list of found files if any 
 
     # 32-bit System directory (C:\Windows\System32)
@@ -344,9 +342,9 @@ function Invoke-IkeextCheck {
             if ($Verbose) { Write-Host -NoNewLine -ForeGroundColor Blue "[*] " ; Write-Host "|__ Found file: '$($_.FullName)'" }
         }
         $is_vulnerable = $False 
-        Write-Host -NoNewLine -ForeGroundColor Red "[-] " ; Write-Host "'wlbsctrl.dll' was found on the system." ; 
+        Write-Host -NoNewLine -ForeGroundColor Red "[-] " ; Write-Host "'wlbsctrl.dll' was found." ; 
     } else {
-        Write-Host -NoNewLine -ForeGroundColor Green "[+] " ; Write-Host "'wlbsctrl.dll' was not found on the system."
+        Write-Host -NoNewLine -ForeGroundColor Green "[+] " ; Write-Host "'wlbsctrl.dll' wasn't found."
     }
 
     if ($Verbose) { Write-Host "" }
