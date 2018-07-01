@@ -79,6 +79,9 @@ PS C:\temp> Invoke-IkeextExploit
   <img src="https://github.com/itm4n/Ikeext-Privesc/raw/master/screenshots/04_ikeextexploit.PNG">
 </p>
 
+## Update 
+2018-07-01 - The current folder doesn't need to be writable anymore. The script will now try to create a dummy file in each PATH folder instead of creating one in the current folder and then trying to copy it. 
+
 ## Credits 
 
 High-Tech Bridge - Frédéric Bourla, who initially disovered the vulnerability and disclosed it on October 9, 2012. - https://www.htbridge.com/advisory/HTB23108 
