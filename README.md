@@ -84,6 +84,8 @@ PS C:\temp> Invoke-IkeextExploit
 
 2018-07-01 - The initial DLL payload executed the command line "cmd /c C:\PATH\TO\payload.bat". The problem is that if the path contained spaces, a part of it would be interpreted as arguments to cmd. That's why the full path is now between quotes. 
 
+2018-10-05 - There was a bug when only one vulnerable folder was returned by the check script using `-PassThru`. When accessing the first entry of the array, the first character of the string was returned rather than the full path. It's a kind of type confusion in a way. This was solved by casting the variable. Thanks @benichmt1 for reporting the issue. 
+
 ## Credits 
 
 High-Tech Bridge - Frédéric Bourla, who initially disovered the vulnerability and disclosed it on October 9, 2012. - https://www.htbridge.com/advisory/HTB23108 
