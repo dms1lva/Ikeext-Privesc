@@ -488,8 +488,7 @@ function Invoke-IkeextExploit {
 
     $timeout = 30
 
-    $vulnerable_folders = @()
-    $vulnerable_folders = Invoke-IkeextCheck -PassThru 
+    [String[]]$vulnerable_folders = Invoke-IkeextCheck -PassThru 
 
     Write-Host "+----------------------------------------------------------+"
     Write-Host "|               IKEEXT DLL Hijacking Exploit               |"
